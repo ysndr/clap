@@ -77,7 +77,7 @@ fn not_exclusive_with_defaults() {
 #[test]
 fn not_exclusive_with_group() {
     let cmd = Command::new("test")
-        .group(ArgGroup::new("test").arg("foo"))
+        .group(ArgGroup::new("test").member("foo"))
         .arg(
             Arg::new("foo")
                 .long("foo")
@@ -105,7 +105,7 @@ fn default_doesnt_activate_exclusive() {
 fn arg_conflicts_with_group() {
     let mut cmd = Command::new("group_conflict")
         .arg(arg!(-f --flag "some flag").conflicts_with("gr"))
-        .group(ArgGroup::new("gr").arg("some").arg("other"))
+        .group(ArgGroup::new("gr").member("some").member("other"))
         .arg(arg!(--some "some arg"))
         .arg(arg!(--other "other arg"));
 
@@ -173,8 +173,8 @@ fn group_conflicts_with_arg() {
         .arg(arg!(-f --flag "some flag"))
         .group(
             ArgGroup::new("gr")
-                .arg("some")
-                .arg("other")
+                .member("some")
+                .member("other")
                 .conflicts_with("flag"),
         )
         .arg(arg!(--some "some arg"))
@@ -210,7 +210,7 @@ fn group_conflicts_with_arg() {
 fn arg_conflicts_with_required_group() {
     let mut cmd = Command::new("group_conflict")
         .arg(arg!(-f --flag "some flag").conflicts_with("gr"))
-        .group(ArgGroup::new("gr").required(true).arg("some").arg("other"))
+        .group(ArgGroup::new("gr").required(true).member("some").member("other"))
         .arg(arg!(--some "some arg"))
         .arg(arg!(--other "other arg"));
 
@@ -239,7 +239,7 @@ fn arg_conflicts_with_required_group() {
 fn arg_conflicts_with_group_with_required_memeber() {
     let mut cmd = Command::new("group_conflict")
         .arg(arg!(-f --flag "some flag").conflicts_with("gr"))
-        .group(ArgGroup::new("gr").arg("some").arg("other"))
+        .group(ArgGroup::new("gr").member("some").member("other"))
         .arg(arg!(--some "some arg").required(true))
         .arg(arg!(--other "other arg"));
 
@@ -271,8 +271,8 @@ fn required_group_conflicts_with_arg() {
         .group(
             ArgGroup::new("gr")
                 .required(true)
-                .arg("some")
-                .arg("other")
+                .member("some")
+                .member("other")
                 .conflicts_with("flag"),
         )
         .arg(arg!(--some "some arg"))
@@ -304,7 +304,7 @@ fn get_arg_conflicts_with_group() {
     let flag = arg!(--flag).conflicts_with("gr");
     let mut cmd = Command::new("group_conflict")
         .arg(&flag)
-        .group(ArgGroup::new("gr").arg("some").arg("other"))
+        .group(ArgGroup::new("gr").member("some").member("other"))
         .arg(arg!(--some))
         .arg(arg!(--other));
 

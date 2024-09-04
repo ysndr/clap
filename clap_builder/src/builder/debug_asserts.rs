@@ -288,9 +288,15 @@ pub(crate) fn assert_app(cmd: &Command) {
         );
 
         for arg in &group.args {
+            
+            let id_used_by_group = cmd
+                .get_groups()
+                .any(|x| x.id != group.id && x.get_id() == arg);
+            let id_used_by_arg = cmd.get_arguments().any(|x| x.get_id() == arg);
+
             // Args listed inside groups should exist
             assert!(
-                cmd.get_arguments().any(|x| x.get_id() == arg),
+                id_used_by_group || id_used_by_arg,
                 "Command {}: Argument group '{}' contains non-existent argument '{}'",
                 cmd.get_name(),
                 group.get_id(),

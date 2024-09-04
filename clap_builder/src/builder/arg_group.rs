@@ -154,6 +154,40 @@ impl ArgGroup {
     /// ```
     /// [argument]: crate::Arg
     #[must_use]
+    pub fn member(mut self, arg_id: impl IntoResettable<Id>) -> Self {
+        if let Some(arg_id) = arg_id.into_resettable().into_option() {
+            self.args.push(arg_id);
+        } else {
+            self.args.clear();
+        }
+        self
+    }
+
+      /// Adds an [argument] to this group by name
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap_builder as clap;
+    /// # use clap::{Command, Arg, ArgGroup, ArgAction};
+    /// let m = Command::new("myprog")
+    ///     .arg(Arg::new("flag")
+    ///         .short('f')
+    ///         .action(ArgAction::SetTrue))
+    ///     .arg(Arg::new("color")
+    ///         .short('c')
+    ///         .action(ArgAction::SetTrue))
+    ///     .group(ArgGroup::new("req_flags")
+    ///         .arg("flag")
+    ///         .arg("color"))
+    ///     .get_matches_from(vec!["myprog", "-f"]);
+    /// // maybe we don't know which of the two flags was used...
+    /// assert!(m.contains_id("req_flags"));
+    /// // but we can also check individually if needed
+    /// assert!(m.contains_id("flag"));
+    /// ```
+    /// [argument]: crate::Arg
+    #[must_use]
     pub fn arg(mut self, arg_id: impl IntoResettable<Id>) -> Self {
         if let Some(arg_id) = arg_id.into_resettable().into_option() {
             self.args.push(arg_id);
@@ -187,11 +221,61 @@ impl ArgGroup {
     /// ```
     /// [arguments]: crate::Arg
     #[must_use]
-    pub fn args(mut self, ns: impl IntoIterator<Item = impl Into<Id>>) -> Self {
+    pub fn members(mut self, ns: impl IntoIterator<Item = impl Into<Id>>) -> Self {
         for n in ns {
-            self = self.arg(n);
+            self = self.member(n);
         }
         self
+    }
+
+
+    /// Adds multiple [arguments] to this group by name
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap_builder as clap;
+    /// # use clap::{Command, Arg, ArgGroup, ArgAction};
+    /// let m = Command::new("myprog")
+    ///     .arg(Arg::new("flag")
+    ///         .short('f')
+    ///         .action(ArgAction::SetTrue))
+    ///     .arg(Arg::new("color")
+    ///         .short('c')
+    ///         .action(ArgAction::SetTrue))
+    ///     .group(ArgGroup::new("req_flags")
+    ///         .args(["flag", "color"]))
+    ///     .get_matches_from(vec!["myprog", "-f"]);
+    /// // maybe we don't know which of the two flags was used...
+    /// assert!(m.contains_id("req_flags"));
+    /// // but we can also check individually if needed
+    /// assert!(m.contains_id("flag"));
+    /// ```
+    /// [arguments]: crate::Arg
+    #[must_use]
+    pub fn args(mut self, ns: impl IntoIterator<Item = impl Into<Id>>) -> Self {
+        for n in ns {
+            self = self.member(n);
+        }
+        self
+    }
+
+    /// Getters for all args. It will return a vector of `Id`
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # use clap_builder as clap;
+    /// # use clap::{ArgGroup};
+    /// let args: Vec<&str> = vec!["a1".into(), "a4".into()];
+    /// let grp = ArgGroup::new("program").args(&args);
+    ///
+    /// for (pos, arg) in grp.get_args().enumerate() {
+    ///     assert_eq!(*arg, args[pos]);
+    /// }
+    /// ```
+    pub fn get_members(&self) -> impl Iterator<Item = &Id> {
+        self.args.iter()
     }
 
     /// Getters for all args. It will return a vector of `Id`
@@ -537,9 +621,9 @@ mod test {
     #[test]
     fn groups() {
         let g = ArgGroup::new("test")
-            .arg("a1")
-            .arg("a4")
-            .args(["a2", "a3"])
+            .member("a1")
+            .member("a4")
+            .members(["a2", "a3"])
             .required(true)
             .conflicts_with("c1")
             .conflicts_with_all(["c2", "c3"])
@@ -560,9 +644,9 @@ mod test {
     #[test]
     fn test_from() {
         let g = ArgGroup::new("test")
-            .arg("a1")
-            .arg("a4")
-            .args(["a2", "a3"])
+            .member("a1")
+            .member("a4")
+            .members(["a2", "a3"])
             .required(true)
             .conflicts_with("c1")
             .conflicts_with_all(["c2", "c3"])
@@ -592,19 +676,19 @@ mod test {
     fn arg_group_expose_is_multiple_helper() {
         let args: Vec<Id> = vec!["a1".into(), "a4".into()];
 
-        let mut grp_multiple = ArgGroup::new("test_multiple").args(&args).multiple(true);
+        let mut grp_multiple = ArgGroup::new("test_multiple").members(&args).multiple(true);
         assert!(grp_multiple.is_multiple());
 
-        let mut grp_not_multiple = ArgGroup::new("test_multiple").args(&args).multiple(false);
+        let mut grp_not_multiple = ArgGroup::new("test_multiple").members(&args).multiple(false);
         assert!(!grp_not_multiple.is_multiple());
     }
 
     #[test]
     fn arg_group_expose_get_args_helper() {
         let args: Vec<Id> = vec!["a1".into(), "a4".into()];
-        let grp = ArgGroup::new("program").args(&args);
+        let grp = ArgGroup::new("program").members(&args);
 
-        for (pos, arg) in grp.get_args().enumerate() {
+        for (pos, arg) in grp.get_members().enumerate() {
             assert_eq!(*arg, args[pos]);
         }
     }

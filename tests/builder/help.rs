@@ -2324,7 +2324,7 @@ fn issue_1487() {
         .arg(Arg::new("arg2").group("group1"))
         .group(
             ArgGroup::new("group1")
-                .args(["arg1", "arg2"])
+                .members(["arg1", "arg2"])
                 .required(true),
         );
 
@@ -2687,7 +2687,7 @@ fn issue_1794_usage() {
         .arg(Arg::new("pos1").action(ArgAction::Set))
         .group(
             ArgGroup::new("arg1")
-                .args(["pos1", "option1"])
+                .members(["pos1", "option1"])
                 .required(true),
         )
         .arg(Arg::new("pos2").action(ArgAction::Set));

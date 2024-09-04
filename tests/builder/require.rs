@@ -147,7 +147,7 @@ For more information, try '--help'.
 fn group_required() {
     let result = Command::new("group_required")
         .arg(arg!(-f --flag "some flag"))
-        .group(ArgGroup::new("gr").required(true).arg("some").arg("other"))
+        .group(ArgGroup::new("gr").required(true).member("some").member("other"))
         .arg(arg!(--some "some arg"))
         .arg(arg!(--other "other arg"))
         .try_get_matches_from(vec!["", "-f"]);
@@ -160,7 +160,7 @@ fn group_required() {
 fn group_required_2() {
     let m = Command::new("group_required")
         .arg(arg!(-f --flag "some flag").action(ArgAction::SetTrue))
-        .group(ArgGroup::new("gr").required(true).arg("some").arg("other"))
+        .group(ArgGroup::new("gr").required(true).member("some").member("other"))
         .arg(arg!(--some "some arg").action(ArgAction::SetTrue))
         .arg(arg!(--other "other arg").action(ArgAction::SetTrue))
         .try_get_matches_from(vec!["", "-f", "--some"])
@@ -174,7 +174,7 @@ fn group_required_2() {
 fn group_required_3() {
     let m = Command::new("group_required")
         .arg(arg!(-f --flag "some flag").action(ArgAction::SetTrue))
-        .group(ArgGroup::new("gr").required(true).arg("some").arg("other"))
+        .group(ArgGroup::new("gr").required(true).member("some").member("other"))
         .arg(arg!(--some "some arg").action(ArgAction::SetTrue))
         .arg(arg!(--other "other arg").action(ArgAction::SetTrue))
         .try_get_matches_from(vec!["", "-f", "--other"])
@@ -188,7 +188,7 @@ fn group_required_3() {
 fn arg_require_group() {
     let result = Command::new("arg_require_group")
         .arg(arg!(-f --flag "some flag").requires("gr"))
-        .group(ArgGroup::new("gr").arg("some").arg("other"))
+        .group(ArgGroup::new("gr").member("some").member("other"))
         .arg(arg!(--some "some arg"))
         .arg(arg!(--other "other arg"))
         .try_get_matches_from(vec!["", "-f"]);
@@ -205,7 +205,7 @@ fn arg_require_group_2() {
                 .requires("gr")
                 .action(ArgAction::SetTrue),
         )
-        .group(ArgGroup::new("gr").arg("some").arg("other"))
+        .group(ArgGroup::new("gr").member("some").member("other"))
         .arg(arg!(--some "some arg").action(ArgAction::SetTrue))
         .arg(arg!(--other "other arg").action(ArgAction::SetTrue))
         .try_get_matches_from(vec!["", "-f", "--some"]);
@@ -224,7 +224,7 @@ fn arg_require_group_3() {
                 .requires("gr")
                 .action(ArgAction::SetTrue),
         )
-        .group(ArgGroup::new("gr").arg("some").arg("other"))
+        .group(ArgGroup::new("gr").member("some").member("other"))
         .arg(arg!(--some "some arg").action(ArgAction::SetTrue))
         .arg(arg!(--other "other arg").action(ArgAction::SetTrue))
         .try_get_matches_from(vec!["", "-f", "--other"]);
@@ -1028,7 +1028,7 @@ For more information, try '--help'.
         )
         .group(
             ArgGroup::new("test_group")
-                .args(["g1", "g2"])
+                .members(["g1", "g2"])
                 .required(true),
         );
     utils::assert_output(
@@ -1336,7 +1336,7 @@ fn group_requires_with_default_value() {
     let result = Command::new("prog")
         .arg(Arg::new("opt").long("opt").default_value("default"))
         .arg(Arg::new("flag").long("flag").action(ArgAction::SetTrue))
-        .group(ArgGroup::new("one").arg("opt").requires("flag"))
+        .group(ArgGroup::new("one").member("opt").requires("flag"))
         .try_get_matches_from(vec!["myprog"]);
 
     assert!(

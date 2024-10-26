@@ -70,6 +70,25 @@ fn group_single_value() {
     assert_eq!(m.get_one::<Id>("grp").map(|v| v.as_str()).unwrap(), "color");
 }
 
+#[cfg(debug_assertions)]
+#[test]
+fn subgroup() {
+    let res = Command::new("group")
+        .arg(arg!(-f --flag "some flag"))
+        .arg(arg!(-c --color "some other flag"))
+        .group(ArgGroup::new("subgroup1").members(["flag"]).required(true))
+        .group(ArgGroup::new("subgroup2").members(["color"]).required(true))
+        .group(
+            ArgGroup::new("parent")
+                .members(["subgroup1", "subgroup2"])
+                .required(true)
+                .multiple(false),
+        )
+        .try_get_matches_from(vec!["group", "--flag", "--color"]);
+
+    assert!(res.is_err(), "{:#?}", res);
+}
+
 #[test]
 fn group_empty() {
     let res = Command::new("group")

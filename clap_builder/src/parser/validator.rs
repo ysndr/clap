@@ -514,14 +514,8 @@ impl Conflicts {
 }
 
 fn gather_direct_conflicts(cmd: &Command, id: &Id) -> Vec<Id> {
-    let conf = if let Some(arg) = cmd.find(id) {
-        gather_arg_direct_conflicts(cmd, arg)
-    } else if let Some(group) = cmd.find_group(id) {
-        gather_group_direct_conflicts(group)
-    } else {
-        debug_assert!(false, "id={id:?} is unknown");
-        Vec::new()
-    };
+    let mut conf = Vec::new();
+    gather_member_direct_conflicts(cmd, id, Vec::new(), &mut conf);
     debug!("Conflicts::gather_direct_conflicts id={id:?}, conflicts={conf:?}",);
     conf
 }
@@ -544,6 +538,57 @@ fn gather_arg_direct_conflicts(cmd: &Command, arg: &Arg) -> Vec<Id> {
     conf.extend(arg.overrides.iter().cloned());
 
     conf
+}
+
+fn gather_member_direct_conflicts(
+    cmd: &Command,
+    member_id: &Id,
+    path: Vec<Id>,
+    conflicts: &mut Vec<Id>,
+) {
+    let parent_id = path.last().unwrap_or(&member_id);
+
+    for group_id in cmd.groups_for_member(parent_id) {
+        let group = cmd.find_group(&group_id).expect(INTERNAL_ERROR_MSG);
+        for conflict_id in &group.conflicts {
+            if let Some(conflict) = cmd.find(conflict_id) {
+                conflicts.push(conflict.id.clone());
+            } else if let Some(group) = cmd.find_group(conflict_id) {
+                for member in members_recursive_ignore_path(cmd, &path, group) {
+                    conflicts.push(member);
+                }
+            }
+        }
+
+        if !group.multiple {
+            for member in members_recursive_ignore_path(cmd, &path, group) {
+                conflicts.push(member);
+            }
+        }
+
+        let mut path = path.clone();
+        path.push(group_id);
+        gather_member_direct_conflicts(cmd, member_id, path, conflicts);
+    }
+}
+
+fn members_recursive_ignore_path(cmd: &Command, path: &[Id], group: &ArgGroup) -> Vec<Id> {
+    let mut members = Vec::new();
+    for member_id in group.get_members() {
+        if let Some(_member) = cmd.find(member_id) {
+            if !path.contains(&member_id) {
+                members.push(member_id.clone());
+            }
+        }
+        if let Some(group) = cmd.find_group(member_id) {
+            if !path.contains(group.get_id()) {
+                let mut path = path.to_vec();
+                path.push(group.get_id().clone());
+                members.extend(members_recursive_ignore_path(cmd, &path, group))
+            }
+        }
+    }
+    members
 }
 
 fn gather_group_direct_conflicts(group: &ArgGroup) -> Vec<Id> {

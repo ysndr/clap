@@ -514,6 +514,15 @@ impl Conflicts {
 }
 
 fn gather_direct_conflicts(cmd: &Command, id: &Id) -> Vec<Id> {
+    // let conf = if let Some(arg) = cmd.find(id) {
+    //     gather_arg_direct_conflicts(cmd, arg)
+    // } else if let Some(group) = cmd.find_group(id) {
+    //     gather_group_direct_conflicts(group)
+    // } else {
+    //     debug_assert!(false, "id={id:?} is unknown");
+    //     Vec::new()
+    // };
+
     let mut conf = Vec::new();
     gather_member_direct_conflicts(cmd, id, Vec::new(), &mut conf);
     debug!("Conflicts::gather_direct_conflicts id={id:?}, conflicts={conf:?}",);
@@ -539,6 +548,32 @@ fn gather_arg_direct_conflicts(cmd: &Command, arg: &Arg) -> Vec<Id> {
 
     conf
 }
+
+// conflicts(arg_id: &Id, path: Vec<&Id>, conf: &mut Vec<Id>)
+
+// parent_id = path[-1] ? arg_id
+// for group in groups_for_arg(parnt_id) {
+
+// 	for conflict in group.conflicts {
+// 		if conflict.is_group {
+// 			for member in members_recursive_ignore_path(path, group) {
+// 				conf.push(member.id)
+// 			}
+// 		} else {
+// 			conf.push(conflict.id)
+// 		}
+// 	}
+
+// 	if !group.multiple {
+// 		for member in members_recursive_ignore_path(path, group) {
+// 			conf.push(member.id)
+// 		}
+// 	}
+
+// 	path = path.clone()
+// 	path.push(group.id)
+// 	conflicts(arg_id, path, conf)
+// }
 
 fn gather_member_direct_conflicts(
     cmd: &Command,

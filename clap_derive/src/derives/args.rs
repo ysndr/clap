@@ -72,7 +72,7 @@ pub(crate) fn derive_args(input: &DeriveInput) -> Result<TokenStream, syn::Error
 }
 
 pub(crate) fn gen_for_enum(
-    _item: &Item,
+    item: &Item,
     item_name: &Ident,
     generics: &Generics,
     variants: &[(Item, &Variant)],
@@ -86,12 +86,20 @@ pub(crate) fn gen_for_enum(
     let mut constructors = TokenStream::default();
     let mut updaters = TokenStream::default();
 
+    let variant_group_ids = variants
+        .iter()
+        .map(|(_, v)| Some(Name::Derived(v.ident.clone())))
+        .collect::<Vec<_>>();
+
+    let item_group_id = item.group_id();
+
     for (item, variant) in variants.iter() {
         let Fields::Named(ref fields) = variant.fields else {
             abort! { variant.span(),
                 "`#[derive(Args)]` only supports named enum variants if used on an enum",
             }
         };
+
         let group_id = item.group_id();
 
         let conflicts = variants
@@ -219,10 +227,23 @@ pub(crate) fn gen_for_enum(
         impl #impl_generics clap::Args for #item_name #ty_generics #where_clause {
             fn group_id() -> Option<clap::Id> {
                 // todo: how does this interact with nested groups here
-                None
+                Some(clap::Id::from(#item_group_id))
             }
             fn augment_args<'b>(#app_var: clap::Command) -> clap::Command {
+
+
+
+                let #app_var = #app_var.group(
+                    clap::ArgGroup::new(#item_group_id)
+                        .multiple(false)
+                        .args({
+                             [#( clap::Id::from(#variant_group_ids) ),* ]
+                        })
+                );
+
                 #augmentations
+
+
                 #app_var
             }
             fn augment_args_for_update<'b>(#app_var: clap::Command) -> clap::Command {
@@ -602,25 +623,12 @@ pub(crate) fn gen_augment(
 
         let group_methods = parent_item.group_methods();
 
-        let conflicts_method = if conflicts.is_empty() {
-            quote!()
-        } else {
-            let conflicts_len = conflicts.len();
-            quote! {
-                .conflicts_with_all({
-                    let conflicts: [clap::Id; #conflicts_len] = [#( clap::Id::from(#conflicts) ),* ];
-                    conflicts
-                })
-            }
-        };
-
         quote!(
             .group(
                 clap::ArgGroup::new(#group_id)
                     .multiple(true)
                     #group_methods
                     .args(#literal_group_members)
-                    #conflicts_method
             )
         )
     };

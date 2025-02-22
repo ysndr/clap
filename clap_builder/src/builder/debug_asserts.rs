@@ -288,7 +288,6 @@ pub(crate) fn assert_app(cmd: &Command) {
         );
 
         for arg in &group.args {
-            
             let id_used_by_group = cmd
                 .get_groups()
                 .any(|x| x.id != group.id && x.get_id() == arg);

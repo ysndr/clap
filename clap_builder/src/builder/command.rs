@@ -4672,6 +4672,16 @@ impl Command {
             .map(|grp| grp.id.clone())
     }
 
+    /// Iterate through the groups that contain this member.
+    pub(crate) fn groups_for_member<'a>(&'a self, member: &Id) -> impl Iterator<Item = Id> + 'a {
+        debug!("Command::groups_for_member: id={member:?}");
+        let member = member.clone();
+        self.groups
+            .iter()
+            .filter(move |grp| grp.args.iter().any(|m| m == &member))
+            .map(|grp| grp.id.clone())
+    }
+
     pub(crate) fn find_group(&self, group_id: &Id) -> Option<&ArgGroup> {
         self.groups.iter().find(|g| g.id == *group_id)
     }
@@ -4729,6 +4739,8 @@ impl Command {
                 }
             }
         }
+
+        debug!("Command::unroll_args_in_group: group={group:?}, args={args:?}");
 
         args
     }

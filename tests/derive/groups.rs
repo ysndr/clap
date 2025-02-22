@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{ArgGroup, Parser};
 
 use crate::utils::assert_output;
 
@@ -290,6 +290,12 @@ fn enum_groups_1() {
             .unwrap_err()
             .kind(),
     );
+
+    // println!("{}", Opt::try_parse_from(["test", "-b",])
+            // .unwrap_err());
+
+// ArgGroup::multiple(self, yes)
+
 
     // assert_eq!(       )
 }

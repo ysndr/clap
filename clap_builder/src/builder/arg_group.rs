@@ -679,7 +679,9 @@ mod test {
         let mut grp_multiple = ArgGroup::new("test_multiple").members(&args).multiple(true);
         assert!(grp_multiple.is_multiple());
 
-        let mut grp_not_multiple = ArgGroup::new("test_multiple").members(&args).multiple(false);
+        let mut grp_not_multiple = ArgGroup::new("test_multiple")
+            .members(&args)
+            .multiple(false);
         assert!(!grp_not_multiple.is_multiple());
     }
 

@@ -7,7 +7,11 @@ fn required_group_missing_arg() {
     let result = Command::new("group")
         .arg(arg!(-f --flag "some flag"))
         .arg(arg!( -c --color "some other flag"))
-        .group(ArgGroup::new("req").members(["flag", "color"]).required(true))
+        .group(
+            ArgGroup::new("req")
+                .members(["flag", "color"])
+                .required(true),
+        )
         .try_get_matches_from(vec![""]);
     assert!(result.is_err());
     let err = result.err().unwrap();
@@ -21,7 +25,11 @@ fn non_existing_arg() {
     let _ = Command::new("group")
         .arg(arg!(-f --flag "some flag"))
         .arg(arg!(-c --color "some other flag"))
-        .group(ArgGroup::new("req").members(["flg", "color"]).required(true))
+        .group(
+            ArgGroup::new("req")
+                .members(["flg", "color"])
+                .required(true),
+        )
         .try_get_matches_from(vec![""]);
 }
 
@@ -273,7 +281,11 @@ fn group_overrides_required() {
     let command = Command::new("group")
         .arg(arg!(--foo <FOO>).required(true))
         .arg(arg!(--bar <BAR>).required(true))
-        .group(ArgGroup::new("group").members(["foo", "bar"]).required(true));
+        .group(
+            ArgGroup::new("group")
+                .members(["foo", "bar"])
+                .required(true),
+        );
     let result = command.try_get_matches_from(vec!["group", "--foo", "value"]);
     assert!(result.is_ok(), "{}", result.unwrap_err());
     let m = result.unwrap();

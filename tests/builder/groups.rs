@@ -281,7 +281,11 @@ fn group_overrides_required() {
     let command = Command::new("group")
         .arg(arg!(--foo <FOO>).required(true))
         .arg(arg!(--bar <BAR>).required(true))
-        .group(ArgGroup::new("group").members(["foo", "bar"]).required(true));
+        .group(
+            ArgGroup::new("group")
+                .members(["foo", "bar"])
+                .required(true),
+        );
     let result = command.try_get_matches_from(vec!["group", "--foo", "value"]);
     assert!(result.is_ok(), "{}", result.unwrap_err());
     let m = result.unwrap();

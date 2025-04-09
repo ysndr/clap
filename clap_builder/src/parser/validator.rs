@@ -567,7 +567,7 @@ fn members_recursive_ignore_path(cmd: &Command, path: &[Id], group: &ArgGroup) -
             if !path.contains(group.get_id()) {
                 let mut path = path.to_vec();
                 path.push(group.get_id().clone());
-                members.extend(members_recursive_ignore_path(cmd, &path, group))
+                members.extend(members_recursive_ignore_path(cmd, &path, group));
             }
         }
     }

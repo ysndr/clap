@@ -25,7 +25,11 @@ fn non_existing_arg() {
     let _ = Command::new("group")
         .arg(arg!(-f --flag "some flag"))
         .arg(arg!(-c --color "some other flag"))
-        .group(ArgGroup::new("req").members(["flg", "color"]).required(true))
+        .group(
+            ArgGroup::new("req")
+                .members(["flg", "color"])
+                .required(true),
+        )
         .try_get_matches_from(vec![""]);
 }
 

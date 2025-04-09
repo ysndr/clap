@@ -355,6 +355,4 @@ fn enum_groups_1() {
             .kind(),
         clap::error::ErrorKind::ArgumentConflict,
     );
-
-    // assert_eq!(       )
 }

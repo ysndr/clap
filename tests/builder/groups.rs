@@ -78,7 +78,6 @@ fn group_single_value() {
     assert_eq!(m.get_one::<Id>("grp").map(|v| v.as_str()).unwrap(), "color");
 }
 
-#[cfg(debug_assertions)]
 #[test]
 fn subgroup() {
     let res = Command::new("group")

@@ -531,7 +531,7 @@ fn gather_member_direct_conflicts(
 ) {
     let parent_id = path.last().unwrap_or(member_id);
 
-    for group_id in cmd.groups_for_member(parent_id) {
+    for group_id in cmd.groups_for_arg(parent_id) {
         let group = cmd.find_group(&group_id).expect(INTERNAL_ERROR_MSG);
         for conflict_id in &group.conflicts {
             if let Some(conflict) = cmd.find(conflict_id) {

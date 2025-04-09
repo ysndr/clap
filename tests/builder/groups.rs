@@ -93,7 +93,8 @@ fn subgroup() {
         )
         .try_get_matches_from(vec!["group", "--flag", "--color"]);
 
-    assert!(res.is_err(), "{:#?}", res);
+    let err = res.unwrap_err();
+    assert_eq!(err.kind(), ErrorKind::ArgumentConflict);
 }
 
 #[test]

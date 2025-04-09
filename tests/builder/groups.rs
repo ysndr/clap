@@ -7,7 +7,11 @@ fn required_group_missing_arg() {
     let result = Command::new("group")
         .arg(arg!(-f --flag "some flag"))
         .arg(arg!( -c --color "some other flag"))
-        .group(ArgGroup::new("req").members(["flag", "color"]).required(true))
+        .group(
+            ArgGroup::new("req")
+                .members(["flag", "color"])
+                .required(true),
+        )
         .try_get_matches_from(vec![""]);
     assert!(result.is_err());
     let err = result.err().unwrap();

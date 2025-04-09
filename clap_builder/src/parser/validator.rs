@@ -488,9 +488,18 @@ impl Conflicts {
 }
 
 fn gather_direct_conflicts(cmd: &Command, id: &Id) -> Vec<Id> {
-    let mut conf = Vec::new();
-    gather_member_direct_conflicts(cmd, id, Vec::new(), &mut conf);
-    debug!("Conflicts::gather_direct_conflicts id={id:?}, conflicts={conf:?}",);
+    let conf = if let Some(arg) = cmd.find(id) {
+        gather_arg_direct_conflicts(cmd, arg)
+    } else if let Some(group) = cmd.find_group(id) {
+        let mut conf = Vec::new();
+        gather_member_direct_conflicts(cmd, id, Vec::new(), &mut conf);
+        debug!("Conflicts::gather_direct_conflicts id={id:?}, conflicts={conf:?}",);
+        conf
+    } else {
+        debug_assert!(false, "id={id:?} is unknown");
+        Vec::new()
+    };
+
     conf
 }
 

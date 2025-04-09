@@ -529,7 +529,7 @@ fn gather_member_direct_conflicts(
     path: Vec<Id>,
     conflicts: &mut Vec<Id>,
 ) {
-    let parent_id = path.last().unwrap_or(&member_id);
+    let parent_id = path.last().unwrap_or(member_id);
 
     for group_id in cmd.groups_for_member(parent_id) {
         let group = cmd.find_group(&group_id).expect(INTERNAL_ERROR_MSG);

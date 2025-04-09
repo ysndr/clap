@@ -19,6 +19,8 @@
           pkgs.libiconv
           pkgs.darwin.apple_sdk.frameworks.Security
           pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+          pkgs.darwin.apple_sdk.frameworks.CoreServices
+
           (fenix.packages.aarch64-darwin.combine [
             fenix.packages.aarch64-darwin.stable.cargo
             fenix.packages.aarch64-darwin.stable.rust

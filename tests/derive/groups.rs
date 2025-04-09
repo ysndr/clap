@@ -353,6 +353,7 @@ fn enum_groups_1() {
         Opt::try_parse_from(["test", "-b", "-a"])
             .unwrap_err()
             .kind(),
+        clap::error::ErrorKind::ArgumentConflict,
     );
 
     // assert_eq!(       )
